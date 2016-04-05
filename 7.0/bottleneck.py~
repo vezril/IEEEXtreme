@@ -1,0 +1,159 @@
+#!/usr/bin/env python
+
+'''
+10
+1  5
+2  5
+3  5
+4  6
+5  7
+6  7
+7  8
+8  9
+8  10
+'''
+
+def IsEndpoint(g, n):
+    for i in range(0,len(g)):
+        if g[n][i] == 1:
+            return False
+
+    return True
+
+def Traverse(g, root, candidates):
+    if root in candidates:
+        return False
+    if IsEndpoint(g, root):
+        return True
+    for s in findSuccessors(g,root):
+        r = Traverse(g, s, candidates)
+    return r
+    
+
+def findSuccessors(g, root):
+    f = []
+    for i in range(0,len(g)):
+        if g[root][i] == 1:
+            f.append(i)
+    return f
+
+def findEndpoints(g,ins):
+    f = []
+    for i in ins:
+        if 1 in g[i]:
+            f.append(i)
+    return f
+
+def findStartpoints(g, ins):
+    f = []
+    for i in ins:
+        for j in range(0,len(g)):
+            if g[j][i] == 1:
+                f.append(i)
+    return f
+        
+
+def PrintInputs(g):
+
+    for dst in range(0,len(g)):
+        cnt = 0
+        for src in range(0,len(g)):
+            if g[src][dst] == 1:
+                cnt +=1
+        print 'Dst ' + str(dst)+ ': ' + str(cnt)
+
+def findOutputs(g):
+    # 1. Find smallest # inputs
+    # 2. Get all # inputs
+    
+    ins = [0 for x in xrange(N+1)]
+    f = []
+    for src in range(0,len(g)):
+        cnt = 0
+        for dst in range(0,len(g)):
+            if g[src][dst] == 1:
+                ins[src] +=1
+    minv = 99999999999999
+    
+    # Find minimum
+    for i in range(0,len(ins)):
+        if minv > ins[i] and ins[i] > 0:
+            minv = ins[i]
+
+    for i in range(0, len(ins)):
+        if ins[i] == minv:
+            f.append(i)
+    return f
+        
+def findInputs(g):
+    # 1. Find smallest # inputs
+    # 2. Get all # inputs
+    
+    ins = [0 for x in xrange(N+1)]
+    f = []
+    for dst in range(0,len(g)):
+        cnt = 0
+        for src in range(0,len(g)):
+            if g[src][dst] == 1:
+                ins[dst] +=1
+    minv = 99999999999999
+    
+    # Find minimum
+    for i in range(0,len(ins)):
+        if minv > ins[i] and ins[i] > 0:
+            minv = ins[i]
+
+    for i in range(0, len(ins)):
+        if ins[i] == minv:
+            f.append(i)
+        
+    return f
+
+if __name__ == "__main__":
+    N = int(raw_input())
+    c = []
+    for i in range(0,N-1):
+        c.append(raw_input().split('  '))
+
+    g = [[0 for x in xrange(N+1)] for x in xrange(N+1)]
+
+
+    for e in c:
+        g[int(e[0])][int(e[1])] = 1
+        
+    i = {}   
+    ins = findInputs(g)
+    ins = findEndpoints(g,ins)
+    
+    for c in ins:
+        for s in findSuccessors(g,c):
+            
+            x = Traverse(g, s, ins)
+            
+            #print 'Candidate: ' + str(c) + ' ' + str(x)
+            i[c] = x
+            
+    #print 'Outputs: '
+   # print ''        
+    outs = findOutputs(g)
+    outs = findStartpoints(g, outs)
+    o = {}
+    for c in outs:
+        for s in findSuccessors(g,c):
+            
+            x = Traverse(g, s, outs)
+            
+          #  print 'Candidate: ' + str(c) + ' ' + str(x)    
+            o[c] = x
+    r = []
+    for k in o:
+        if o[k] == True:
+            r.append(k)
+            
+    for k in i:
+        if i[k] == True:
+            r.append(k)
+            
+    r.sort()
+    for i in r:
+        print i
